@@ -14,6 +14,11 @@ from pathlib import Path
 from fairscale.nn.model_parallel.initialize import initialize_model_parallel
 
 from llama import ModelArgs, Transformer, Tokenizer, LLaMA
+import debugpy
+
+debugpy.listen(('localhost', 5678))
+debugpy.wait_for_client()
+
 
 
 def setup_model_parallel() -> Tuple[int, int]:
@@ -106,13 +111,20 @@ plush girafe => girafe peluche
 
 cheese =>""",
     ]
-    results = generator.generate(
-        prompts, max_gen_len=256, temperature=temperature, top_p=top_p
-    )
+    # results = generator.generate(
+    #     prompts, max_gen_len=256, temperature=temperature, top_p=top_p
+    # )
 
-    for result in results:
-        print(result)
-        print("\n==================================\n")
+    # for result in results:
+    #     print(result)
+    #     print("\n==================================\n")
+    start_time = time.time()
+    generator.encode([prompts[-1]], temperature=temperature)
+    print(f"Encoded in {time.time() - start_time:.2f} seconds")
+
+    start_time = time.time()
+    generator.decode(temperature=temperature)
+    print(f"Decoded in {time.time() - start_time:.2f} seconds")
 
 
 if __name__ == "__main__":
