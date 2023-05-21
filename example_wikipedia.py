@@ -46,6 +46,7 @@ def load(
     world_size: int,
     max_seq_len: int,
     max_batch_size: int,
+    freq_mult: float = 20000,
 ) -> LLaMA:
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
@@ -68,7 +69,7 @@ def load(
     torch.set_default_tensor_type(torch.FloatTensor)
     model.load_state_dict(checkpoint, strict=False)
 
-    generator = LLaMA(model, tokenizer)
+    generator = LLaMA(model, tokenizer, freq_mult=freq_mult)
     print(f"Loaded in {time.time() - start_time:.2f} seconds")
     return generator
 
@@ -77,9 +78,11 @@ def main(
     ckpt_dir: str,
     tokenizer_path: str,
     temperature: float = 0.8,
-    top_p: float = 0.95,
     max_seq_len: int = 512,
     max_batch_size: int = 32,
+    freq_mult: float = 20000,
+    enc_dir: str = "comp", 
+    dec_dir: str = "decomp",
 ):
     local_rank, world_size = setup_model_parallel()
     if local_rank > 0:
@@ -91,8 +94,13 @@ def main(
     print(f"RAM memory used: {(mem_after - mem_before)} MB")
 
     generator = load(
-        ckpt_dir, tokenizer_path, local_rank, world_size, max_seq_len, max_batch_size
+        ckpt_dir, tokenizer_path, local_rank, world_size, max_seq_len, max_batch_size, freq_mult=freq_mult
     )
+
+    enc_dir = Path(enc_dir)
+    dec_dir = Path(dec_dir)
+    enc_dir.mkdir(parents=True, exist_ok=True)
+    dec_dir.mkdir(parents=True, exist_ok=True)
 
     for i in range(50, 200):
         text = wiki[i]["text"]
@@ -104,10 +112,10 @@ def main(
         decompressed_name = f"decompressed_{i}.txt"
 
         start_time = time.time()
-        with contextlib.closing(arithmeticcoding.BitOutputStream(open(compressed_name, "wb"))) as bitout:
+        with contextlib.closing(arithmeticcoding.BitOutputStream(open(enc_dir / compressed_name, "wb"))) as bitout:
             generator.encode([text], bitout, temperature=temperature)
         
-        # with open(compressed_name, "rb") as inp, open(decompressed_name, "w") as out:
+        # with open(enc_dir / compressed_name, "rb") as inp, open(dec_dir / decompressed_name, "w") as out:
         #     bitin = arithmeticcoding.BitInputStream(inp)
         #     generator.decode(bitin, out, temperature=temperature)
 
