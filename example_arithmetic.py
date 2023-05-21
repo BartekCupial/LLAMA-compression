@@ -42,7 +42,13 @@ def decompress(freqs, bitin, tokenizer, out):
     return decoded_data
 
 
-def main(tokenizer_path: str, enc_dir: str = "arithmetic_enc", dec_dir: str = "arithmetic_dec"):
+def main(
+    tokenizer_path: str, 
+    enc_dir: str = "arithmetic_enc", 
+    dec_dir: str = "arithmetic_dec",
+    n_files: int = 200,
+    compress_only: bool = True,
+):
     mem_before = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
     wiki = load_dataset("wikipedia", "20220301.en", split="train")
     mem_after = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
@@ -58,7 +64,7 @@ def main(tokenizer_path: str, enc_dir: str = "arithmetic_enc", dec_dir: str = "a
     freqs = arithmeticcoding.SimpleFrequencyTable(initfreqs)
     dec_freqs = arithmeticcoding.SimpleFrequencyTable(initfreqs)
 
-    for i in range(1, 200):
+    for i in range(n_files):
         text = wiki[i]["text"]
 
         compressed_name = f"compressed_{i}.bin"
@@ -70,9 +76,10 @@ def main(tokenizer_path: str, enc_dir: str = "arithmetic_enc", dec_dir: str = "a
         with contextlib.closing(arithmeticcoding.BitOutputStream(open(enc_dir / compressed_name, "wb"))) as bitout:
             compress(tokens, freqs, bitout)
         
-        with open(enc_dir / compressed_name, "rb") as inp, open(dec_dir / decompressed_name, "w") as out:
-            bitin = arithmeticcoding.BitInputStream(inp)
-            decompress(dec_freqs, bitin, tokenizer, out)
+        if compress_only:
+            with open(enc_dir / compressed_name, "rb") as inp, open(dec_dir / decompressed_name, "w") as out:
+                bitin = arithmeticcoding.BitInputStream(inp)
+                decompress(dec_freqs, bitin, tokenizer, out)
 
         print(f"Processed text {i} in {time.time() - start_time:.2f} seconds")
 

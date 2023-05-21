@@ -83,6 +83,8 @@ def main(
     freq_mult: float = 20000,
     enc_dir: str = "comp", 
     dec_dir: str = "decomp",
+    n_files: int = 200,
+    compress_only: bool = True,
 ):
     local_rank, world_size = setup_model_parallel()
     if local_rank > 0:
@@ -102,7 +104,7 @@ def main(
     enc_dir.mkdir(parents=True, exist_ok=True)
     dec_dir.mkdir(parents=True, exist_ok=True)
 
-    for i in range(50, 200):
+    for i in range(n_files):
         text = wiki[i]["text"]
 
         with open(f"wikitext_{i}.txt", "w") as file:
@@ -115,9 +117,10 @@ def main(
         with contextlib.closing(arithmeticcoding.BitOutputStream(open(enc_dir / compressed_name, "wb"))) as bitout:
             generator.encode([text], bitout, temperature=temperature)
         
-        # with open(enc_dir / compressed_name, "rb") as inp, open(dec_dir / decompressed_name, "w") as out:
-        #     bitin = arithmeticcoding.BitInputStream(inp)
-        #     generator.decode(bitin, out, temperature=temperature)
+        if compress_only:
+            with open(enc_dir / compressed_name, "rb") as inp, open(dec_dir / decompressed_name, "w") as out:
+                bitin = arithmeticcoding.BitInputStream(inp)
+                generator.decode(bitin, out, temperature=temperature)
 
         print(f"Processed text {i} in {time.time() - start_time:.2f} seconds")
 
