@@ -14,7 +14,6 @@
 
 # linking libraries enable running on arbitrary servers
 
-torchrun --nproc_per_node 1 example_wikipedia.py --ckpt_dir /home/z1188643/llama-dl/7B --tokenizer_path /home/z1188643/llama-dl/tokenizer.model
 
 # torchrun --nproc_per_node 1 example_wikipedia.py \
 #     --ckpt_dir /home/z1188643/llama-dl/7B \
@@ -22,12 +21,20 @@ torchrun --nproc_per_node 1 example_wikipedia.py --ckpt_dir /home/z1188643/llama
 #     --freq_mult 2000 \
 #     --enc_dir comp2000 \
 #     --dec_dir decomp2000 \
-#     --n_files 200
+#     --n_files 50
 
 # torchrun --nproc_per_node 1 example_wikipedia.py \
 #     --ckpt_dir /home/z1188643/llama-dl/7B \
 #     --tokenizer_path /home/z1188643/llama-dl/tokenizer.model \
-#     --freq_mult 200000 \
-#     --enc_dir comp200000 \
-#     --dec_dir decomp200000 \
-#     --n_files 200
+#     --freq_mult 2000 \
+#     --enc_dir comp20000 \
+#     --dec_dir decomp20000 \
+#     --n_files 50
+
+torchrun --nproc_per_node 1 example_wikipedia.py \
+    --ckpt_dir /home/z1188643/llama-dl/7B \
+    --tokenizer_path /home/z1188643/llama-dl/tokenizer.model \
+    --freq_mult 200000 \
+    --enc_dir comp200000 \
+    --dec_dir decomp200000 \
+    --n_files 50

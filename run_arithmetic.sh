@@ -11,7 +11,7 @@
 
 #squeue -u ${USER} --Format "JobID:.6 ,Partition:.4 ,Name:.10 ,StateCompact:.2 ,TimeUsed:.11 ,Qos:.7 ,TimeLeft:.11 ,ReasonList:.16 ,Command:.40"
 
-torchrun --nproc_per_node 1 example_arithmetic.py \
+python example_arithmetic.py \
     --tokenizer_path /home/z1188643/llama-dl/tokenizer.model \
     --enc_dir arithmetic_enc \
     --dec_dir arithmetic_dec \

@@ -83,7 +83,7 @@ def main(
     freq_mult: float = 20000,
     enc_dir: str = "comp", 
     dec_dir: str = "decomp",
-    n_files: int = 200,
+    n_files: int = 50,
     compress_only: bool = True,
 ):
     local_rank, world_size = setup_model_parallel()
