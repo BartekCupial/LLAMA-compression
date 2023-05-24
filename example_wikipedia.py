@@ -107,9 +107,6 @@ def main(
     for i in range(n_files):
         text = wiki[i]["text"]
 
-        with open(f"wikitext_{i}.txt", "w") as file:
-            file.write(text)
-
         compressed_name = f"compressed_{i}.bin"
         decompressed_name = f"decompressed_{i}.txt"
 
@@ -117,7 +114,7 @@ def main(
         with contextlib.closing(arithmeticcoding.BitOutputStream(open(enc_dir / compressed_name, "wb"))) as bitout:
             generator.encode([text], bitout, temperature=temperature)
         
-        if compress_only:
+        if not compress_only:
             with open(enc_dir / compressed_name, "rb") as inp, open(dec_dir / decompressed_name, "w") as out:
                 bitin = arithmeticcoding.BitInputStream(inp)
                 generator.decode(bitin, out, temperature=temperature)

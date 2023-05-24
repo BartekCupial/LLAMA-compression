@@ -38,7 +38,6 @@ def decompress(freqs, bitin, tokenizer, out):
 
     decoded_data = tokenizer.decode(decoded_tokens)
     out.write(decoded_data)
-    print(decoded_data)
     return decoded_data
 
 
@@ -76,7 +75,7 @@ def main(
         with contextlib.closing(arithmeticcoding.BitOutputStream(open(enc_dir / compressed_name, "wb"))) as bitout:
             compress(tokens, freqs, bitout)
         
-        if compress_only:
+        if not compress_only:
             with open(enc_dir / compressed_name, "rb") as inp, open(dec_dir / decompressed_name, "w") as out:
                 bitin = arithmeticcoding.BitInputStream(inp)
                 decompress(dec_freqs, bitin, tokenizer, out)
