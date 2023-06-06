@@ -81,6 +81,7 @@ def main(
     max_seq_len: int = 512,
     max_batch_size: int = 32,
     freq_mult: float = 20000,
+    dataset: str = "20220301.en",
     enc_dir: str = "comp", 
     dec_dir: str = "decomp",
     n_files: int = 50,
@@ -91,7 +92,7 @@ def main(
         sys.stdout = open(os.devnull, "w")
 
     mem_before = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
-    wiki = load_dataset("wikipedia", "20220301.en", split="train")
+    wiki = load_dataset("wikipedia", dataset, split="train")
     mem_after = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
     print(f"RAM memory used: {(mem_after - mem_before)} MB")
 
